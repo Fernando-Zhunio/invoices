@@ -1,15 +1,18 @@
-﻿namespace invoices.Models
+using System.ComponentModel.DataAnnotations;
+
+namespace invoices.DTOs
 {
-    public class Sku
+    public class SkuCreateDto
     {
-        public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public float Price { get; set; }
+        [Required]
         public string Description { get; set; }
         public int VariationId { get; set; }
-        public Variation Variation { get; set; }
-        public List<Attachment> Images  { get; set; }
+        [Required]
         public string Reference { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }

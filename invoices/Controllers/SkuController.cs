@@ -1,4 +1,6 @@
-﻿using invoices.Helper;
+﻿using AutoMapper;
+using invoices.DTOs;
+using invoices.Helper;
 using invoices.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,29 +12,50 @@ namespace invoices.Controllers
     [Route("api/sku")]
     public class SkuController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        public SkuController(ApplicationDbContext context)
+        private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
+
+        public SkuController(ApplicationDbContext context, IMapper mapper)
         {
-            _context = context;
+            this.context = context;
+            this.mapper = mapper;
         }
 
-        // GET: SkuController
         [HttpGet]
-        public async Task<ActionResult> Index([FromQuery] int page = 1, [FromQuery] int pageSize = 15)
+        public async Task<ActionResult> Index(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15,
+            [FromQuery] string search = null
+        )
         {
-            var skus = await _context.sku.OrderBy(x => x.Id).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            return Ok(skus);
+            var skus = new List<Sku>();
+            if (search != null)
+            {
+                skus = await context.sku
+                    .Where(x => x.Name.Contains(search))
+                    .OrderBy(x => x.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+            }
+            skus = await context.sku
+                .OrderBy(x => x.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(mapper.Map<List<SkuDto>>(skus));
         }
 
         // GET: SkuController/Details/5
         [HttpGet("{id}/show")]
         public async Task<ActionResult> Details(int id)
         {
-            var sku = await _context.sku.FirstOrDefaultAsync(x => x.Id == id);
+            var sku = await context.sku.FirstOrDefaultAsync(x => x.Id == id);
             if (sku == null)
                 return NotFound();
             else
-                return Ok(sku);
+                return Ok(mapper.Map<SkuDto>(sku));
         }
 
         //    // GET: SkuController/Create
@@ -49,8 +72,8 @@ namespace invoices.Controllers
         {
             try
             {
-                _context.sku.Add(sku);
-                await _context.SaveChangesAsync();
+                context.sku.Add(sku);
+                await context.SaveChangesAsync();
                 return Ok();
             }
             catch
@@ -63,7 +86,7 @@ namespace invoices.Controllers
         [HttpGet("{id}/edit")]
         public async Task<ActionResult> Edit(int id)
         {
-            var sku = await _context.sku.FirstOrDefaultAsync(x => x.Id == id);
+            var sku = await context.sku.FirstOrDefaultAsync(x => x.Id == id);
             if (sku == null)
                 return NotFound();
             else
@@ -89,7 +112,7 @@ namespace invoices.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var sku = await _context.sku.FirstOrDefaultAsync(x => x.Id == id);
+            var sku = await context.sku.FirstOrDefaultAsync(x => x.Id == id);
             if (sku == null)
                 return NotFound();
             else

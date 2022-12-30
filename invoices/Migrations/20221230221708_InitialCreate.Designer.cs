@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using invoices;
 
@@ -11,9 +12,10 @@ using invoices;
 namespace invoices.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221230221708_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,15 +75,10 @@ namespace invoices.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SkuId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SkuId");
 
                     b.ToTable("attachments");
                 });
@@ -183,9 +180,6 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -193,8 +187,6 @@ namespace invoices.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClientId");
 
                     b.ToTable("invoices");
                 });
@@ -262,6 +254,9 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("AttachmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -284,6 +279,8 @@ namespace invoices.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AttachmentId");
 
                     b.HasIndex("ProductId");
 
@@ -409,13 +406,6 @@ namespace invoices.Migrations
                     b.ToTable("variations");
                 });
 
-            modelBuilder.Entity("invoices.Models.Attachment", b =>
-                {
-                    b.HasOne("invoices.Models.Sku", null)
-                        .WithMany("Images")
-                        .HasForeignKey("SkuId");
-                });
-
             modelBuilder.Entity("invoices.Models.Client", b =>
                 {
                     b.HasOne("invoices.Models.Address", "Address")
@@ -432,17 +422,6 @@ namespace invoices.Migrations
                         .HasForeignKey("SkuId");
 
                     b.Navigation("Sku");
-                });
-
-            modelBuilder.Entity("invoices.Models.Invoice", b =>
-                {
-                    b.HasOne("invoices.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("invoices.Models.ItemInvoice", b =>
@@ -475,6 +454,10 @@ namespace invoices.Migrations
 
             modelBuilder.Entity("invoices.Models.Sku", b =>
                 {
+                    b.HasOne("invoices.Models.Attachment", "Attachment")
+                        .WithMany()
+                        .HasForeignKey("AttachmentId");
+
                     b.HasOne("invoices.Models.Product", null)
                         .WithMany("Sku")
                         .HasForeignKey("ProductId");
@@ -482,6 +465,8 @@ namespace invoices.Migrations
                     b.HasOne("invoices.Models.Variation", "Variation")
                         .WithMany()
                         .HasForeignKey("VariationId");
+
+                    b.Navigation("Attachment");
 
                     b.Navigation("Variation");
                 });
@@ -508,11 +493,6 @@ namespace invoices.Migrations
             modelBuilder.Entity("invoices.Models.Product", b =>
                 {
                     b.Navigation("Sku");
-                });
-
-            modelBuilder.Entity("invoices.Models.Sku", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("invoices.Models.TaxAndDiscount", b =>
