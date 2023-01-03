@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace invoices.Models
+namespace invoices.DTOs
 {
-    public class TypeAttachment
+    public class BrandDto
     {
         public int Id { get; set; }
-        [Required]
         public string Name { get; set; }
         public string Description { get; set; }
+        public string Image { get; set; }
     }
 }

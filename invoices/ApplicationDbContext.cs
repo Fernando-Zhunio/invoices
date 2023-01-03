@@ -9,7 +9,7 @@ namespace invoices
         {
 
         }
-        public DbSet<Address> address { get; set; }
+        public DbSet<Address> addresses { get; set; }
         public DbSet<Attachment> attachments { get; set; }
         public DbSet<Brand> brands { get; set; }
         public DbSet<Category> categories { get; set; }

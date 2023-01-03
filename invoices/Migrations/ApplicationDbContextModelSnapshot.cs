@@ -73,15 +73,21 @@ namespace invoices.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SkuId")
+                    b.Property<int>("SkuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeAttachmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SkuId");
+
+                    b.HasIndex("TypeAttachmentId");
 
                     b.ToTable("attachments");
                 });
@@ -97,10 +103,11 @@ namespace invoices.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -132,7 +139,7 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AddressId")
+                    b.Property<int>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("Doc")
@@ -265,10 +272,14 @@ namespace invoices.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ImagesId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Price")
@@ -280,7 +291,7 @@ namespace invoices.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("VariationId")
+                    b.Property<int>("VariationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -411,16 +422,30 @@ namespace invoices.Migrations
 
             modelBuilder.Entity("invoices.Models.Attachment", b =>
                 {
-                    b.HasOne("invoices.Models.Sku", null)
+                    b.HasOne("invoices.Models.Sku", "Sku")
                         .WithMany("Images")
-                        .HasForeignKey("SkuId");
+                        .HasForeignKey("SkuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("invoices.Models.TypeAttachment", "TypeAttachment")
+                        .WithMany()
+                        .HasForeignKey("TypeAttachmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sku");
+
+                    b.Navigation("TypeAttachment");
                 });
 
             modelBuilder.Entity("invoices.Models.Client", b =>
                 {
                     b.HasOne("invoices.Models.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Address");
                 });
@@ -481,7 +506,9 @@ namespace invoices.Migrations
 
                     b.HasOne("invoices.Models.Variation", "Variation")
                         .WithMany()
-                        .HasForeignKey("VariationId");
+                        .HasForeignKey("VariationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Variation");
                 });

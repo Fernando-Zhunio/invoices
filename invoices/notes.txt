@@ -1,0 +1,7 @@
+
+    "defaultConnection": "Server=FERNANDO-ZHUNIO\\SQLEXPRESS;Database=InvoicesFz;Trusted_Connection=True;"
+
+
+    "defaultConnection": "Server=DESKTOP-C565VSD\\SQLEXPRESS;Database=InvoicesFz;Trusted_Connection=True;"
+
+

@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using invoices.Models;
 
-namespace invoices.Models
+namespace invoices.DTOs
 {
-    public class Attachment
+    public class AttachmentDto
     {
         public int Id { get; set; }
-        [Required]
         public int SkuId { get; set; }
         public Sku Sku { get; set; }
-        [Required]
         public int TypeAttachmentId { get; set; }
         public TypeAttachment TypeAttachment { get; set; }
         public string Name { get; set; }
-        [Required]
         public string Url { get; set; }
-
     }
 }

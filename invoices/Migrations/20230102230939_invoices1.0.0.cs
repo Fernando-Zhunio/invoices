@@ -5,22 +5,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace invoices.Migrations
 {
-    public partial class Invoicesv100beta02 : Migration
+    public partial class invoices100 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "attachments",
+                name: "address",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Latitude = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Longitude = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Direction = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_attachments", x => x.Id);
+                    table.PrimaryKey("PK_address", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -29,9 +36,9 @@ namespace invoices.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -52,42 +59,6 @@ namespace invoices.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "clients",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TypeDoc = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AddressId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_clients", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_clients_address_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "address",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "invoices",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SubTotal = table.Column<float>(type: "real", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_invoices", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "taxAndDiscounts",
                 columns: table => new
                 {
@@ -95,7 +66,7 @@ namespace invoices.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    value = table.Column<double>(type: "float", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -131,6 +102,29 @@ namespace invoices.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_variations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "clients",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeDoc = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Doc = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddressId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_clients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_clients_address_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "address",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -200,16 +194,37 @@ namespace invoices.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "invoices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubTotal = table.Column<float>(type: "real", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_invoices_clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "sku",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImagesId = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VariationId = table.Column<int>(type: "int", nullable: true),
-                    AttachmentId = table.Column<int>(type: "int", nullable: true),
+                    VariationId = table.Column<int>(type: "int", nullable: false),
                     Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: true)
@@ -217,11 +232,6 @@ namespace invoices.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_sku", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_sku_attachments_AttachmentId",
-                        column: x => x.AttachmentId,
-                        principalTable: "attachments",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_sku_products_ProductId",
                         column: x => x.ProductId,
@@ -231,7 +241,36 @@ namespace invoices.Migrations
                         name: "FK_sku_variations_VariationId",
                         column: x => x.VariationId,
                         principalTable: "variations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "attachments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SkuId = table.Column<int>(type: "int", nullable: false),
+                    TypeAttachmentId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_attachments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_attachments_sku_SkuId",
+                        column: x => x.SkuId,
+                        principalTable: "sku",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_attachments_typeAttachments_TypeAttachmentId",
+                        column: x => x.TypeAttachmentId,
+                        principalTable: "typeAttachments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -279,6 +318,16 @@ namespace invoices.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_attachments_SkuId",
+                table: "attachments",
+                column: "SkuId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_attachments_TypeAttachmentId",
+                table: "attachments",
+                column: "TypeAttachmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_clients_AddressId",
                 table: "clients",
                 column: "AddressId");
@@ -287,6 +336,11 @@ namespace invoices.Migrations
                 name: "IX_inventory_SkuId",
                 table: "inventory",
                 column: "SkuId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_invoices_ClientId",
+                table: "invoices",
+                column: "ClientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_itemInvoice_InvoiceId",
@@ -307,11 +361,6 @@ namespace invoices.Migrations
                 name: "IX_products_CategoryId",
                 table: "products",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_sku_AttachmentId",
-                table: "sku",
-                column: "AttachmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_sku_ProductId",
@@ -337,7 +386,7 @@ namespace invoices.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "clients");
+                name: "attachments");
 
             migrationBuilder.DropTable(
                 name: "inventory");
@@ -349,10 +398,10 @@ namespace invoices.Migrations
                 name: "taxAndDiscountConditionals");
 
             migrationBuilder.DropTable(
-                name: "typeAttachments");
+                name: "typeVariations");
 
             migrationBuilder.DropTable(
-                name: "typeVariations");
+                name: "typeAttachments");
 
             migrationBuilder.DropTable(
                 name: "invoices");
@@ -364,13 +413,16 @@ namespace invoices.Migrations
                 name: "taxAndDiscounts");
 
             migrationBuilder.DropTable(
-                name: "attachments");
+                name: "clients");
 
             migrationBuilder.DropTable(
                 name: "products");
 
             migrationBuilder.DropTable(
                 name: "variations");
+
+            migrationBuilder.DropTable(
+                name: "address");
 
             migrationBuilder.DropTable(
                 name: "brands");

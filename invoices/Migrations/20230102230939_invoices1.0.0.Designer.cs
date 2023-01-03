@@ -12,8 +12,8 @@ using invoices;
 namespace invoices.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221212035806_Invoicesv1.0.0-beta.0.2")]
-    partial class Invoicesv100beta02
+    [Migration("20230102230939_invoices1.0.0")]
+    partial class invoices100
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -75,10 +75,21 @@ namespace invoices.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SkuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeAttachmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SkuId");
+
+                    b.HasIndex("TypeAttachmentId");
 
                     b.ToTable("attachments");
                 });
@@ -94,10 +105,11 @@ namespace invoices.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -129,7 +141,7 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AddressId")
+                    b.Property<int>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("Doc")
@@ -180,6 +192,9 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -187,6 +202,8 @@ namespace invoices.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
 
                     b.ToTable("invoices");
                 });
@@ -254,16 +271,17 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AttachmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ImagesId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Price")
@@ -275,12 +293,10 @@ namespace invoices.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("VariationId")
+                    b.Property<int>("VariationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AttachmentId");
 
                     b.HasIndex("ProductId");
 
@@ -315,8 +331,8 @@ namespace invoices.Migrations
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("value")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -406,11 +422,32 @@ namespace invoices.Migrations
                     b.ToTable("variations");
                 });
 
+            modelBuilder.Entity("invoices.Models.Attachment", b =>
+                {
+                    b.HasOne("invoices.Models.Sku", "Sku")
+                        .WithMany("Images")
+                        .HasForeignKey("SkuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("invoices.Models.TypeAttachment", "TypeAttachment")
+                        .WithMany()
+                        .HasForeignKey("TypeAttachmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sku");
+
+                    b.Navigation("TypeAttachment");
+                });
+
             modelBuilder.Entity("invoices.Models.Client", b =>
                 {
                     b.HasOne("invoices.Models.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Address");
                 });
@@ -422,6 +459,17 @@ namespace invoices.Migrations
                         .HasForeignKey("SkuId");
 
                     b.Navigation("Sku");
+                });
+
+            modelBuilder.Entity("invoices.Models.Invoice", b =>
+                {
+                    b.HasOne("invoices.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("invoices.Models.ItemInvoice", b =>
@@ -454,19 +502,15 @@ namespace invoices.Migrations
 
             modelBuilder.Entity("invoices.Models.Sku", b =>
                 {
-                    b.HasOne("invoices.Models.Attachment", "Attachment")
-                        .WithMany()
-                        .HasForeignKey("AttachmentId");
-
                     b.HasOne("invoices.Models.Product", null)
                         .WithMany("Sku")
                         .HasForeignKey("ProductId");
 
                     b.HasOne("invoices.Models.Variation", "Variation")
                         .WithMany()
-                        .HasForeignKey("VariationId");
-
-                    b.Navigation("Attachment");
+                        .HasForeignKey("VariationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Variation");
                 });
@@ -493,6 +537,11 @@ namespace invoices.Migrations
             modelBuilder.Entity("invoices.Models.Product", b =>
                 {
                     b.Navigation("Sku");
+                });
+
+            modelBuilder.Entity("invoices.Models.Sku", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("invoices.Models.TaxAndDiscount", b =>

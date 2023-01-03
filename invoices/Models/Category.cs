@@ -1,8 +1,11 @@
-﻿namespace invoices.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace invoices.Models
 {
     public class Category
     {
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
 
     }

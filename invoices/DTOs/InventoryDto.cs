@@ -1,10 +1,12 @@
-﻿namespace invoices.Models
+using System.ComponentModel.DataAnnotations;
+using invoices.Models;
+
+namespace invoices.DTOs
 {
-    public class Inventory
+    public class InventoryDto
     {
         public int Id { get; set; }
         public int SkuId { get; set; }
-        public Sku Sku { get; set; }
         public int Stock { get; set; }
     }
 }
