@@ -1,6 +1,9 @@
 using AutoMapper;
+using EntityFrameworkPaginateCore;
 using invoices.DTOs;
 using invoices.Models;
+using invoices.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +11,7 @@ namespace invoices.Controllers
 {
     [ApiController]
     [Route("api/brands")]
-    public class BrandController : Controller
+    public class BrandController : ControllerApi
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
@@ -20,29 +23,38 @@ namespace invoices.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+        // [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult> Index(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 15,
             [FromQuery] string search = null
         )
         {
-            var brands = new List<Brand>();
+            var brands = new Page<Brand>();
             if (search != null)
             {
                 brands = await context.brands
                     .Where(x => x.Name.Contains(search))
-                    .OrderBy(x => x.Id)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+                    // .OrderBy(x => x.Id)
+                    // .Skip((page - 1) * pageSize)
+                    // .Take(pageSize)
+                    // .ToListAsync();
+                    .PaginateAsync(page, pageSize);
             }
-            brands = await context.brands
-                .OrderBy(x => x.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            else
+            {
+                brands = await context.brands
+                // .OrderBy(x => x.Id)
+                // .Skip((page - 1) * pageSize)
+                // .Take(pageSize)
+                .PaginateAsync(page, pageSize);
+            }
 
-            return Ok(mapper.Map<List<BrandDto>>(brands));
+            return ResponseOk(
+                brands
+            // mapper.Map<List<BrandDto>>(brands)
+            );
         }
 
         [HttpPost()]

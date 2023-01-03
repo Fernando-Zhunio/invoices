@@ -5,3 +5,43 @@
     "defaultConnection": "Server=DESKTOP-C565VSD\\SQLEXPRESS;Database=InvoicesFz;Trusted_Connection=True;"
 
 
+commands:
+    
+  Migrations
+        dotnet ef migrations add InitialCreate
+        dotnet ef database update
+
+    Create a new migration
+        dotnet ef migrations add InitialCreate
+
+    Update the database
+        dotnet ef database update
+
+    Remove the last migration
+        dotnet ef migrations remove
+
+    Drop the database
+        dotnet ef database drop
+
+    List migrations
+        dotnet ef migrations list
+
+    Script migrations
+        dotnet ef migrations script
+	
+	Packages
+		Add package
+			dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+		
+		Remove package
+			dotnet remove package Microsoft.EntityFrameworkCore.SqlServer
+
+		Restore packages
+			dotnet restore
+		
+
+
+
+    
+
+    

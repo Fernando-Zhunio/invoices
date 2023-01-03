@@ -8,7 +8,7 @@ namespace invoices.Controllers
 {
     [ApiController]
     [Route("api/clients/{clientId:int}/Addresses")]
-    public class AddressController : Controller
+    public class AddressController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
