@@ -3,6 +3,7 @@ using EntityFrameworkPaginateCore;
 using invoices.DTOs;
 using invoices.Models;
 using invoices.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +24,7 @@ namespace invoices.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        // [Authorize(Roles = "Admin,Manager")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Index(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 15,
@@ -73,7 +73,7 @@ namespace invoices.Controllers
                 return NotFound();
             else
 
-                return Ok(mapper.Map<Address>(brand));
+                return Ok(mapper.Map<BrandDto>(brand));
         }
 
         [HttpPatch("{id}")]
@@ -86,7 +86,7 @@ namespace invoices.Controllers
             brand = mapper.Map(brandDto, brand);
             context.brands.Update(brand);
             await context.SaveChangesAsync();
-            return Ok(mapper.Map<Brand>(brand));
+            return Ok(mapper.Map<BrandDto>(brand));
         }
 
         [HttpDelete("{id}")]

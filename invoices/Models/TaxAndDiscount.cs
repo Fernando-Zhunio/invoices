@@ -1,15 +1,28 @@
-﻿namespace invoices.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace invoices.Models
 {
     public class TaxAndDiscount
     {
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
         public string Description { get; set; }
-        public Double value { get; set; }
-        public string Type { get; set; }
+        [Required]
+        public float value { get; set; }
+        public bool IsPercentage { get; set; } = true;
+        [Required]
+        public TaxAndDiscountType Type { get; set; }
         public bool IsActive { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }       
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }       
         public List<TaxAndDiscountConditional> taxAndDiscountConditionals { get; set; }
+        public List<TaxAndDiscountInvoice> Invoices { get; set; }
+    }
+
+    public enum TaxAndDiscountType
+    {
+        Tax,
+        Discount
     }
 }

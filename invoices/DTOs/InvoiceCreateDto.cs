@@ -1,18 +1,15 @@
 using System.ComponentModel.DataAnnotations;
+using invoices.Models;
 
-namespace invoices.Models
+namespace invoices.DTOs
 {
-    public class Invoice
+    public class InvoiceCreateDto
     {
-        public int Id { get; set; }
         [Required]
         public float SubTotal { get; set; }
-        public List<ItemInvoice> Sku { get; set; }
         [Required]
         public int ClientId { get; set; }
         public Client Client { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public List<TaxAndDiscountInvoice> TaxAndDiscounts { get; set; }
-
     }
 }

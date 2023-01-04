@@ -1,18 +1,17 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace invoices.Models
+namespace invoices.DTOs
 {
-    public class TypeVariation
+    public class TypeVariationCreateDto
     {
         public int Id { get; set; }
+
         [Required]
         public string Name { get; set; }
-        public int VariationId { get; set; }
-        public Variation Variation { get; set; }
         [Required]
-        [Column(TypeName = "nvarchar(max)")]
+        public int VariationId { get; set; }
+
+        [Required]
         public string Value { get; set; }
     }
-
 }
