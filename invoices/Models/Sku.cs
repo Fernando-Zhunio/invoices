@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class Sku
+    public class Sku: BaseEntity
     {
-        public int Id { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

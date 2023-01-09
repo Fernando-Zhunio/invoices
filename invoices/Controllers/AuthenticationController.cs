@@ -70,7 +70,6 @@ namespace invoices.Controllers
             var claims = new List<Claim>()
             {
                 new Claim("email", credentialsUser.Email),
-                // new Claim("names", credentialsUser.id),
                 // new Claim(ClaimTypes.NameIdentifier, id)
             };
             var keys = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));

@@ -12,8 +12,8 @@ using invoices;
 namespace invoices.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230103184503_invoice-identity")]
-    partial class invoiceidentity
+    [Migration("20230109204148_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -43,6 +43,9 @@ namespace invoices.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Direction")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -52,6 +55,9 @@ namespace invoices.Migrations
 
                     b.Property<string>("Longitude")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
@@ -81,6 +87,12 @@ namespace invoices.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -112,11 +124,17 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -135,6 +153,12 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -152,6 +176,9 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Doc")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -163,6 +190,9 @@ namespace invoices.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TypeDoc")
                         .IsRequired()
@@ -180,6 +210,12 @@ namespace invoices.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("SkuId")
                         .HasColumnType("int");
@@ -208,6 +244,12 @@ namespace invoices.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<float>("SubTotal")
                         .HasColumnType("real");
 
@@ -226,22 +268,55 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("InvoiceId")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("productId")
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("quantity")
+                    b.Property<int>("SkuId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("InvoiceId");
 
-                    b.HasIndex("productId");
+                    b.HasIndex("SkuId");
 
                     b.ToTable("itemInvoice");
+                });
+
+            modelBuilder.Entity("invoices.Models.PriceHistorySku", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<int>("SkuId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkuId");
+
+                    b.ToTable("pricesHistorySku");
                 });
 
             modelBuilder.Entity("invoices.Models.Product", b =>
@@ -252,14 +327,20 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("BrandId")
+                    b.Property<int>("BrandId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -281,6 +362,9 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -290,6 +374,9 @@ namespace invoices.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -297,13 +384,14 @@ namespace invoices.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("VariationId")
+                    b.Property<int?>("VariationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -323,26 +411,36 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("IsPercentage")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("value")
-                        .HasColumnType("float");
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<float>("value")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -357,7 +455,13 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("TaxAndDiscountId")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TaxAndDiscountId")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -373,6 +477,30 @@ namespace invoices.Migrations
                     b.ToTable("taxAndDiscountConditionals");
                 });
 
+            modelBuilder.Entity("invoices.Models.TaxAndDiscountInvoice", b =>
+                {
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TaxAndDiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("InvoiceId", "TaxAndDiscountId");
+
+                    b.HasIndex("TaxAndDiscountId");
+
+                    b.ToTable("taxAndDiscountInvoice");
+                });
+
             modelBuilder.Entity("invoices.Models.TypeAttachment", b =>
                 {
                     b.Property<int>("Id")
@@ -381,8 +509,14 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -401,13 +535,21 @@ namespace invoices.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Value")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("VariationId")
+                    b.Property<int>("VariationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -424,6 +566,12 @@ namespace invoices.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -685,26 +833,47 @@ namespace invoices.Migrations
 
             modelBuilder.Entity("invoices.Models.ItemInvoice", b =>
                 {
-                    b.HasOne("invoices.Models.Invoice", null)
+                    b.HasOne("invoices.Models.Invoice", "Invoice")
                         .WithMany("Sku")
-                        .HasForeignKey("InvoiceId");
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("invoices.Models.Sku", "product")
+                    b.HasOne("invoices.Models.Sku", "Sku")
                         .WithMany()
-                        .HasForeignKey("productId");
+                        .HasForeignKey("SkuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("product");
+                    b.Navigation("Invoice");
+
+                    b.Navigation("Sku");
+                });
+
+            modelBuilder.Entity("invoices.Models.PriceHistorySku", b =>
+                {
+                    b.HasOne("invoices.Models.Sku", "Sku")
+                        .WithMany("Prices")
+                        .HasForeignKey("SkuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sku");
                 });
 
             modelBuilder.Entity("invoices.Models.Product", b =>
                 {
                     b.HasOne("invoices.Models.Brand", "Brand")
                         .WithMany()
-                        .HasForeignKey("BrandId");
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("invoices.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Brand");
 
@@ -713,31 +882,60 @@ namespace invoices.Migrations
 
             modelBuilder.Entity("invoices.Models.Sku", b =>
                 {
-                    b.HasOne("invoices.Models.Product", null)
+                    b.HasOne("invoices.Models.Product", "Product")
                         .WithMany("Sku")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("invoices.Models.Variation", "Variation")
                         .WithMany()
-                        .HasForeignKey("VariationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("VariationId");
+
+                    b.Navigation("Product");
 
                     b.Navigation("Variation");
                 });
 
             modelBuilder.Entity("invoices.Models.TaxAndDiscountConditional", b =>
                 {
-                    b.HasOne("invoices.Models.TaxAndDiscount", null)
+                    b.HasOne("invoices.Models.TaxAndDiscount", "TaxAndDiscount")
                         .WithMany("taxAndDiscountConditionals")
-                        .HasForeignKey("TaxAndDiscountId");
+                        .HasForeignKey("TaxAndDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TaxAndDiscount");
+                });
+
+            modelBuilder.Entity("invoices.Models.TaxAndDiscountInvoice", b =>
+                {
+                    b.HasOne("invoices.Models.Invoice", "Invoice")
+                        .WithMany("TaxAndDiscounts")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("invoices.Models.TaxAndDiscount", "TaxAndDiscount")
+                        .WithMany("Invoices")
+                        .HasForeignKey("TaxAndDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("TaxAndDiscount");
                 });
 
             modelBuilder.Entity("invoices.Models.TypeVariation", b =>
                 {
-                    b.HasOne("invoices.Models.Variation", null)
+                    b.HasOne("invoices.Models.Variation", "Variation")
                         .WithMany("value")
-                        .HasForeignKey("VariationId");
+                        .HasForeignKey("VariationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Variation");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -799,6 +997,8 @@ namespace invoices.Migrations
             modelBuilder.Entity("invoices.Models.Invoice", b =>
                 {
                     b.Navigation("Sku");
+
+                    b.Navigation("TaxAndDiscounts");
                 });
 
             modelBuilder.Entity("invoices.Models.Product", b =>
@@ -809,10 +1009,14 @@ namespace invoices.Migrations
             modelBuilder.Entity("invoices.Models.Sku", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("Prices");
                 });
 
             modelBuilder.Entity("invoices.Models.TaxAndDiscount", b =>
                 {
+                    b.Navigation("Invoices");
+
                     b.Navigation("taxAndDiscountConditionals");
                 });
 

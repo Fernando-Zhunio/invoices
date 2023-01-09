@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class PriceHistorySku
+    public class PriceHistorySku: BaseEntity
     {
-        public int Id { get; set; }
         [Required]
         public int SkuId { get; set; }
         public Sku Sku { get; set; }

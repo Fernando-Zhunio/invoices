@@ -11,9 +11,9 @@ namespace invoices.Utils
             this.mapper = mapper;
         }
         [NonAction]
-        public ActionResult ResponseOk<T>(object data = null)
+        public ActionResult ResponseOk<T>(object data = null, int statusCode = 200, bool success = true)
         {
-            return Ok(new { success = true, data = mapper.Map<T>(data) });
+            return StatusCode(statusCode, new { success = true, data = mapper.Map<T>(data) });
         }
         [NonAction]
          public ActionResult ResponseMapper<T>(object data = null)

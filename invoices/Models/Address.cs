@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class Address
+    public class Address: BaseEntity
     {
-        public int Id { get; set; }
-
         [Required]
         public string City { get; set; }
 

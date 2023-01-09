@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class Client
+    public class Client: BaseEntity
     {
-        public int Id { get; set; }
         [Required]
         public string FirstName { get; set; }
         [Required]

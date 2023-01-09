@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class Invoice
+    public class Invoice: BaseEntity
     {
-        public int Id { get; set; }
         [Required]
         public float SubTotal { get; set; }
         public List<ItemInvoice> Sku { get; set; }

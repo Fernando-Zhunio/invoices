@@ -1,9 +1,10 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class TaxAndDiscountInvoice
+    public class TaxAndDiscountInvoice: BaseEntity
     {
         [Required]
         public int InvoiceId { get; set; }

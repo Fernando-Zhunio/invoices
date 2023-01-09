@@ -31,62 +31,61 @@ namespace invoices.Controllers
             var inventories = new Page<Inventory>();
             if (search != null)
             {
-                inventories = await contest.inventory
+                inventories = await context.inventory
                     .Where(x => x.Sku.Name.Contains(search))
                     .PaginateAsync(page, pageSize);
             }
             else
             {
-                inventories = await contest.inventory.PaginateAsync(page, pageSize);
+                inventories = await context.inventory.PaginateAsync(page, pageSize);
             }
 
-            return ResponseOk(
+            return ResponseOk<InventoryDto>(
                 inventories
-            // mapper.Map<List<BrandDto>>(brands)
             );
         }
 
         [HttpPost]
         public async Task<ActionResult> Store(InventoryCreateDto inventory)
         {
-            contest.inventory.Add(mapper.Map<Inventory>(inventory));
-            await contest.SaveChangesAsync();
-            return ResponseOk();
+            var _inventory = context.inventory.Add(mapper.Map<Inventory>(inventory));
+            await context.SaveChangesAsync();
+            return ResponseOk<InventoryDto>(_inventory);
         }
 
         [HttpGet("{id}/show")]
         public async Task<ActionResult> Edit(int id)
         {
-            var inventory = await contest.inventory.FirstOrDefaultAsync(x => x.Id == id);
+            var inventory = await context.inventory.FirstOrDefaultAsync(x => x.Id == id);
             if (inventory == null)
                 return NotFound();
             else
-                return ResponseOk(mapper.Map<InventoryDto>(inventory));
+                return ResponseOk<InventoryDto>(inventory);
         }
 
         [HttpPatch("{id}")]
         public async Task<ActionResult> Update(int id, InventoryCreateDto inventoryDto)
         {
-            var inventory = await contest.inventory.FirstOrDefaultAsync(x => x.Id == id);
+            var inventory = await context.inventory.FirstOrDefaultAsync(x => x.Id == id);
             if (inventory == null)
                 return NotFound();
 
             inventory = mapper.Map(inventoryDto, inventory);
-            contest.inventory.Update(inventory);
-            await contest.SaveChangesAsync();
-            return ResponseOk(mapper.Map<InventoryDto>(inventory));
+            context.inventory.Update(inventory);
+            await context.SaveChangesAsync();
+            return ResponseOk<InventoryDto>(inventory);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var inventory = await contest.inventory.FirstOrDefaultAsync(x => x.Id == id);
+            var inventory = await context.inventory.FirstOrDefaultAsync(x => x.Id == id);
             if (inventory == null)
                 return NotFound();
 
-            contest.inventory.Remove(inventory);
-            await contest.SaveChangesAsync();
-            return ResponseOk(inventory);
+            context.inventory.Remove(inventory);
+            await context.SaveChangesAsync();
+            return ResponseOk<InventoryDto>(inventory);
         }
     }
 }

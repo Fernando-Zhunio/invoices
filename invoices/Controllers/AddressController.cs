@@ -12,13 +12,11 @@ namespace invoices.Controllers
 {
     [ApiController]
     [Route("api/clients/{clientId:int}/Addresses")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AddressController : ControllerApi
     {
-        public AddressController(ApplicationDbContext context, IMapper mapper) : base(context, mapper)
-        {
-        }
+        public AddressController(ApplicationDbContext context, IMapper mapper)
+            : base(context, mapper) { }
 
         [HttpGet]
         public async Task<ActionResult> Index(
@@ -28,62 +26,58 @@ namespace invoices.Controllers
             [FromQuery] string search = null
         )
         {
-            var addresses = new Page<AddressCreateDto>();
-            var query = query.addresses
-            .OrderBy(x => x.Id)
-            .Where(x => x.ClientId == clientId)
-            .Where(x => x.City.Contains(search));
-
-            addresses = await Paginate<Address, AddressCreateDto>(query, page, pageSize);
-            return ResponseCustom(addresses);
+            var query = context.addresses.OrderBy(x => x.Id).Where(x => x.ClientId == clientId);
+            if (search != null)
+            {
+                query = query.Where(x => x.City.Contains(search));
+            }
+            return await SearchPaginate<Address, AddressDto>(query, page, pageSize, search);
         }
 
         [HttpPost()]
-        public async Task<ActionResult> Store(AddressCreateDto address)
+        public async Task<ActionResult> Store(int clientId, AddressCreateDto addressDto)
         {
-            var _address = contest.addresses.Add(mapper.Map<Address>(address));
-            await contest.SaveChangesAsync();
-            return ResponseMapper<AddressCreateDto>(_address);
+            var client = await context.clients.FirstOrDefaultAsync(x => x.Id == clientId);
+            if (client == null)
+                return NotFound("Client not found");
+            addressDto.ClientId = clientId;
+            var info = await SaveStore<Address, AddressCreateDto>(addressDto);
+            return ResponseOk<AddressCreateDto>(info, 201);
         }
 
         [HttpGet("{id}/edit")]
         public async Task<ActionResult> Edit(int clientId, int id)
         {
-            var address = await contest.addresses.FirstOrDefaultAsync(x => x.Id == id);
+            var address = await context.addresses.FirstOrDefaultAsync(x => x.Id == id);
             if (address == null)
                 return NotFound();
-            else
-
-                return Ok(mapper.Map<Address>(address));
+            return ResponseOk<AddressDto>(address);
         }
 
         [HttpPatch("{id}")]
         public async Task<ActionResult> Update(int clientId, int id, AddressCreateDto addressDto)
         {
-            var address = await contest.addresses.FirstOrDefaultAsync(x => x.Id == id);
-            if (address == null)
-                return NotFound();
-
-            address.City = address.City;
-            address.Country = address.Country;
-            address.State = address.State;
-            address.Street = address.Street;
-            address.ZipCode = address.ZipCode;
-
-            await contest.SaveChangesAsync();
-            return Ok(mapper.Map<Address>(address));
+            var client = await context.clients.FirstOrDefaultAsync(x => x.Id == id);
+            if (client == null)
+                return NotFound("Client not found");
+            addressDto.ClientId = clientId;
+            var info = await SaveUpdate<Address, AddressCreateDto>(id, addressDto);
+            if (info == null)
+                return NotFound("Address not found");
+            return ResponseOk<AddressDto>(info);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int clientId, int id)
         {
-            var sku = await contest.addresses.FirstOrDefaultAsync(x => x.Id == id);
-            if (sku == null)
+            var client = await context.clients.FirstOrDefaultAsync(x => x.Id == clientId);
+            if (client == null)
+                return NotFound("Client not found");
+            var info = await SaveDelete<Address>(id);
+            if (info == null)
                 return NotFound();
-
-            contest.addresses.Remove(sku);
-            await contest.SaveChangesAsync();
-            return Ok(sku);
+            await context.SaveChangesAsync();
+            return ResponseOk<AddressDto>(info);
         }
     }
 }

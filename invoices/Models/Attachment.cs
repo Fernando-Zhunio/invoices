@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using invoices.Utils;
 
 namespace invoices.Models
 {
-    public class Attachment
+    public class Attachment: BaseEntity
     {
-        public int Id { get; set; }
         [Required]
         public int SkuId { get; set; }
         public Sku Sku { get; set; }

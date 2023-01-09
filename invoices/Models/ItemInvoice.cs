@@ -1,8 +1,9 @@
-﻿namespace invoices.Models
+﻿using invoices.Utils;
+
+namespace invoices.Models
 {
-    public class ItemInvoice
+    public class ItemInvoice: BaseEntity
     {
-        public int Id { get; set; }
         public int SkuId { get; set; }
         public Sku Sku { get; set; }
         public int Quantity { get; set; }

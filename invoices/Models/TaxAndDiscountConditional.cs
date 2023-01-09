@@ -1,8 +1,9 @@
-﻿namespace invoices.Models
+﻿using invoices.Utils;
+
+namespace invoices.Models
 {
-    public class TaxAndDiscountConditional
+    public class TaxAndDiscountConditional: BaseEntity
     {
-        public int Id { get; set; }
         public int TaxAndDiscountId { get; set; }
         public TaxAndDiscount TaxAndDiscount { get; set; }
         public string Type { get; set; }

@@ -1,6 +1,8 @@
 using AutoMapper;
+using EntityFrameworkPaginateCore;
 using invoices.DTOs;
 using invoices.Models;
+using invoices.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,16 +10,10 @@ namespace invoices.Controllers
 {
     [ApiController]
     [Route("api/attachments")]
-    public class AttachmentController : Controller
+    public class AttachmentController : ControllerApi
     {
-        private readonly ApplicationDbContext context;
-        private readonly IMapper mapper;
-
         public AttachmentController(ApplicationDbContext context, IMapper mapper)
-        {
-            this.context = context;
-            this.mapper = mapper;
-        }
+            : base(context, mapper) { }
 
         [HttpGet]
         public async Task<ActionResult> Index(
@@ -26,23 +22,12 @@ namespace invoices.Controllers
             [FromQuery] string search = null
         )
         {
-            var attachments = new List<Attachment>();
+            var query = context.addresses.OrderBy(x => x.Id).AsQueryable();
             if (search != null)
             {
-                attachments = await context.attachments
-                    .Where(x => x.Name.Contains(search))
-                    .OrderBy(x => x.Id)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+                query = query.Where(x => x.City.Contains(search));
             }
-            attachments = await context.attachments
-                .OrderBy(x => x.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return Ok(mapper.Map<List<AttachmentDto>>(attachments));
+            return await SearchPaginate<Attachment, AttachmentDto>(query, page, pageSize, search);
         }
 
         [HttpPost]
@@ -64,7 +49,7 @@ namespace invoices.Controllers
                 return Ok(mapper.Map<Attachment>(attachments));
         }
 
-         [HttpPatch("{id}")]
+        [HttpPatch("{id}")]
         public async Task<ActionResult> Update(int id, AttachmentCreateDto attachmentDto)
         {
             var attachment = await context.attachments.FirstOrDefaultAsync(x => x.Id == id);
