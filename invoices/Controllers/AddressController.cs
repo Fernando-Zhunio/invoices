@@ -1,6 +1,10 @@
 using AutoMapper;
+using EntityFrameworkPaginateCore;
 using invoices.DTOs;
 using invoices.Models;
+using invoices.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,55 +12,44 @@ namespace invoices.Controllers
 {
     [ApiController]
     [Route("api/clients/{clientId:int}/Addresses")]
-    public class AddressController : ControllerBase
-    {
-        private readonly ApplicationDbContext context;
-        private readonly IMapper mapper;
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        public AddressController(ApplicationDbContext context, IMapper mapper)
+    public class AddressController : ControllerApi
+    {
+        public AddressController(ApplicationDbContext context, IMapper mapper) : base(context, mapper)
         {
-            this.context = context;
-            this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult> Index(
+            [FromRoute] int clientId,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 15,
             [FromQuery] string search = null
         )
         {
-            var addresses = new List<Address>();
-            if (search != null)
-            {
-                addresses = await context.addresses
-                    .Where(x => x.City.Contains(search))
-                    .OrderBy(x => x.Id)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-            }
-            addresses = await context.addresses
-                .OrderBy(x => x.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var addresses = new Page<AddressCreateDto>();
+            var query = query.addresses
+            .OrderBy(x => x.Id)
+            .Where(x => x.ClientId == clientId)
+            .Where(x => x.City.Contains(search));
 
-            return Ok(mapper.Map<List<AddressDto>>(addresses));
+            addresses = await Paginate<Address, AddressCreateDto>(query, page, pageSize);
+            return ResponseCustom(addresses);
         }
 
         [HttpPost()]
         public async Task<ActionResult> Store(AddressCreateDto address)
         {
-                context.addresses.Add(mapper.Map<Address>(address));
-                await context.SaveChangesAsync();
-                return Ok();
+            var _address = contest.addresses.Add(mapper.Map<Address>(address));
+            await contest.SaveChangesAsync();
+            return ResponseMapper<AddressCreateDto>(_address);
         }
 
         [HttpGet("{id}/edit")]
         public async Task<ActionResult> Edit(int clientId, int id)
         {
-            var address = await context.addresses.FirstOrDefaultAsync(x => x.Id == id);
+            var address = await contest.addresses.FirstOrDefaultAsync(x => x.Id == id);
             if (address == null)
                 return NotFound();
             else
@@ -67,7 +60,7 @@ namespace invoices.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult> Update(int clientId, int id, AddressCreateDto addressDto)
         {
-            var address = await context.addresses.FirstOrDefaultAsync(x => x.Id == id);
+            var address = await contest.addresses.FirstOrDefaultAsync(x => x.Id == id);
             if (address == null)
                 return NotFound();
 
@@ -77,19 +70,19 @@ namespace invoices.Controllers
             address.Street = address.Street;
             address.ZipCode = address.ZipCode;
 
-            await context.SaveChangesAsync();
+            await contest.SaveChangesAsync();
             return Ok(mapper.Map<Address>(address));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var sku = await context.addresses.FirstOrDefaultAsync(x => x.Id == id);
+            var sku = await contest.addresses.FirstOrDefaultAsync(x => x.Id == id);
             if (sku == null)
                 return NotFound();
 
-            context.addresses.Remove(sku);
-            await context.SaveChangesAsync();
+            contest.addresses.Remove(sku);
+            await contest.SaveChangesAsync();
             return Ok(sku);
         }
     }

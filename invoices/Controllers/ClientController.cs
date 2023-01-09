@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace invoices.Controllers
 {
+    [ApiController]
+    [Route("api/clients")]
     public class ClientController: Controller
     {
           private readonly ApplicationDbContext context;
@@ -43,7 +45,7 @@ namespace invoices.Controllers
             return Ok(mapper.Map<List<ClientDto>>(clients));
         }
 
-        [HttpPost()]
+        [HttpPost]
         public async Task<ActionResult> Store(ClientCreateDto clientDto)
         {
             context.clients.Add(mapper.Map<Client>(clientDto));

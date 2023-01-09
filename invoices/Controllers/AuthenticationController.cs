@@ -15,8 +15,8 @@ namespace invoices.Controllers
     [Route("api/auth")]
     public class AuthenticationController : ControllerApi
     {
-        private readonly ApplicationDbContext context;
-        private readonly IMapper mapper;
+        // private readonly ApplicationDbContext context;
+        // private readonly IMapper mapper;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
@@ -27,10 +27,10 @@ namespace invoices.Controllers
             ApplicationDbContext context,
             UserManager<IdentityUser> userManager,
             IMapper mapper
-        )
+        ): base(context, mapper)
         {
-            this.context = context;
-            this.mapper = mapper;
+            // this.context = context;
+            // this.mapper = mapper;
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;

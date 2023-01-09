@@ -14,13 +14,11 @@ namespace invoices.Controllers
     [Route("api/brands")]
     public class BrandController : ControllerApi
     {
-        private readonly ApplicationDbContext context;
-        private readonly IMapper mapper;
+       
 
-        public BrandController(ApplicationDbContext context, IMapper mapper)
+        public BrandController(ApplicationDbContext context, IMapper mapper): base(context, mapper)
         {
-            this.context = context;
-            this.mapper = mapper;
+           
         }
 
         [HttpGet]
@@ -34,7 +32,7 @@ namespace invoices.Controllers
             var brands = new Page<Brand>();
             if (search != null)
             {
-                brands = await context.brands
+                brands = await contest.brands
                     .Where(x => x.Name.Contains(search))
                     // .OrderBy(x => x.Id)
                     // .Skip((page - 1) * pageSize)
@@ -44,7 +42,7 @@ namespace invoices.Controllers
             }
             else
             {
-                brands = await context.brands
+                brands = await contest.brands
                 // .OrderBy(x => x.Id)
                 // .Skip((page - 1) * pageSize)
                 // .Take(pageSize)
@@ -60,15 +58,15 @@ namespace invoices.Controllers
         [HttpPost()]
         public async Task<ActionResult> Store(BrandCreateDto brand)
         {
-            context.brands.Add(mapper.Map<Brand>(brand));
-            await context.SaveChangesAsync();
+            contest.brands.Add(mapper.Map<Brand>(brand));
+            await contest.SaveChangesAsync();
             return Ok();
         }
 
         [HttpGet("{id}/show")]
         public async Task<ActionResult> Edit(int id)
         {
-            var brand = await context.brands.FirstOrDefaultAsync(x => x.Id == id);
+            var brand = await contest.brands.FirstOrDefaultAsync(x => x.Id == id);
             if (brand == null)
                 return NotFound();
             else
@@ -79,25 +77,25 @@ namespace invoices.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult> Update(int id, BrandCreateDto brandDto)
         {
-            var brand = await context.brands.FirstOrDefaultAsync(x => x.Id == id);
+            var brand = await contest.brands.FirstOrDefaultAsync(x => x.Id == id);
             if (brand == null)
                 return NotFound();
 
             brand = mapper.Map(brandDto, brand);
-            context.brands.Update(brand);
-            await context.SaveChangesAsync();
+            contest.brands.Update(brand);
+            await contest.SaveChangesAsync();
             return Ok(mapper.Map<BrandDto>(brand));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var brand = await context.brands.FirstOrDefaultAsync(x => x.Id == id);
+            var brand = await contest.brands.FirstOrDefaultAsync(x => x.Id == id);
             if (brand == null)
                 return NotFound();
 
-            context.brands.Remove(brand);
-            await context.SaveChangesAsync();
+            contest.brands.Remove(brand);
+            await contest.SaveChangesAsync();
             return Ok(brand);
         }
     }
