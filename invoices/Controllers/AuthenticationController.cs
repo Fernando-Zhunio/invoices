@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using invoices.DTOs;
+using invoices.Helper;
 using invoices.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ namespace invoices.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] CredentialsUserDto credentialsUser)
+        public async Task<ActionResult<Response<ResponseRegisteAuth>>> Login([FromBody] CredentialsUserDto credentialsUser)
         {
             var user = await signInManager.PasswordSignInAsync(
                 credentialsUser.Email,
@@ -49,27 +50,29 @@ namespace invoices.Controllers
             {
                 return NotFound();
             }
-            return Ok(GenerateClaimsIdentity(credentialsUser));
+            string userName = await userManager.GetUserNameAsync(await userManager.FindByEmailAsync(credentialsUser.Email));
+            return ResponseOk<ResponseRegisteAuth>(GenerateClaimsIdentity(credentialsUser, userName));
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterUserDto register)
+        public async Task<ActionResult<ResponseRegisteAuth>> Register([FromBody] RegisterUserDto register)
         {
             var user = new IdentityUser { UserName = register.Name, Email = register.Email };
             var result = await userManager.CreateAsync(user, register.Password);
 
             if (result.Succeeded)
             {
-                return Ok(GenerateClaimsIdentity(register));
+                return ResponseOk<ResponseRegisteAuth>(GenerateClaimsIdentity(register, user.UserName));
             }
             return BadRequest(result);
         }
 
-        private ResponseRegisteAuth GenerateClaimsIdentity(CredentialsUserDto credentialsUser)
+        private ResponseRegisteAuth GenerateClaimsIdentity(CredentialsUserDto credentialsUser, string name)
         {
             var claims = new List<Claim>()
             {
                 new Claim("email", credentialsUser.Email),
+                new Claim("name", name),
                 // new Claim(ClaimTypes.NameIdentifier, id)
             };
             var keys = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
@@ -88,7 +91,9 @@ namespace invoices.Controllers
             return new ResponseRegisteAuth
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = expiration
+                expiration = expiration,
+                name = name,
+                email = credentialsUser.Email
             };
         }
     }

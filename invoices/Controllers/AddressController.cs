@@ -34,7 +34,7 @@ namespace invoices.Controllers
             return await SearchPaginate<Address, AddressDto>(query, page, pageSize, search);
         }
 
-        [HttpPost()]
+        [HttpPost]
         public async Task<ActionResult> Store(int clientId, AddressCreateDto addressDto)
         {
             var client = await context.clients.FirstOrDefaultAsync(x => x.Id == clientId);

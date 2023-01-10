@@ -22,10 +22,10 @@ namespace invoices.Controllers
             [FromQuery] string search = null
         )
         {
-            var query = context.addresses.OrderBy(x => x.Id).AsQueryable();
+            var query = context.attachments.OrderBy(x => x.Id).AsQueryable();
             if (search != null)
             {
-                query = query.Where(x => x.City.Contains(search));
+                query = query.Where(x => x.Name.Contains(search));
             }
             return await SearchPaginate<Attachment, AttachmentDto>(query, page, pageSize, search);
         }
