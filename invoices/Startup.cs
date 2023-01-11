@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using invoices.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,9 @@ namespace invoices
 
         public void ConfigureService(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers(option => {
+                option.Filters.Add(typeof (FilterValidationResponseApiAttribute));
+            });
             services.AddDbContext<ApplicationDbContext>(
                 options =>
                     options.UseSqlServer(configuration.GetConnectionString("defaultConnection"))
@@ -94,6 +97,8 @@ namespace invoices
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            
 
             app.UseHttpsRedirection();
             app.UseRouting();

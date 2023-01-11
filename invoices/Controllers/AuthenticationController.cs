@@ -16,8 +16,8 @@ namespace invoices.Controllers
     [Route("api/auth")]
     public class AuthenticationController : ControllerApi
     {
-        // private readonly ApplicationDbContext context;
-        // private readonly IMapper mapper;
+        private readonly ILogger<AuthenticationController> logger;
+
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
@@ -27,47 +27,65 @@ namespace invoices.Controllers
             IConfiguration configuration,
             ApplicationDbContext context,
             UserManager<IdentityUser> userManager,
-            IMapper mapper
-        ): base(context, mapper)
+            IMapper mapper,
+            ILogger<AuthenticationController> logger
+        ) : base(context, mapper)
         {
             // this.context = context;
             // this.mapper = mapper;
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
+            this.logger = logger;
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<Response<ResponseRegisteAuth>>> Login([FromBody] CredentialsUserDto credentialsUser)
+        public async Task<ActionResult<Response<ResponseRegisteAuth>>> Login(
+            [FromBody] CredentialsUserDto credentialsUser
+        )
         {
+            var userFind = await userManager.FindByEmailAsync(credentialsUser.Email);
+            logger.LogInformation("user find "+userFind.ToString());
             var user = await signInManager.PasswordSignInAsync(
-                credentialsUser.Email,
+                userFind.UserName,
                 credentialsUser.Password,
                 false,
                 false
             );
-            if (user == null)
+            logger.LogInformation("Usuario"+user.Succeeded.ToString());
+            if (!user.Succeeded)
             {
-                return NotFound();
+                return ResponseCustom("Correo electrónico o contraseña incorrectos", 401, false);
             }
-            string userName = await userManager.GetUserNameAsync(await userManager.FindByEmailAsync(credentialsUser.Email));
-            return ResponseOk<ResponseRegisteAuth>(GenerateClaimsIdentity(credentialsUser, userName));
+            string userName = await userManager.GetUserNameAsync(
+                await userManager.FindByEmailAsync(credentialsUser.Email)
+            );
+            return ResponseOk<ResponseRegisteAuth>(
+                GenerateClaimsIdentity(credentialsUser, userName)
+            );
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<ResponseRegisteAuth>> Register([FromBody] RegisterUserDto register)
+        public async Task<ActionResult<ResponseRegisteAuth>> Register(
+            [FromBody] RegisterUserDto register
+        )
         {
             var user = new IdentityUser { UserName = register.Name, Email = register.Email };
             var result = await userManager.CreateAsync(user, register.Password);
 
             if (result.Succeeded)
             {
-                return ResponseOk<ResponseRegisteAuth>(GenerateClaimsIdentity(register, user.UserName));
+                return ResponseOk<ResponseRegisteAuth>(
+                    GenerateClaimsIdentity(register, user.UserName)
+                );
             }
             return BadRequest(result);
         }
 
-        private ResponseRegisteAuth GenerateClaimsIdentity(CredentialsUserDto credentialsUser, string name)
+        private ResponseRegisteAuth GenerateClaimsIdentity(
+            CredentialsUserDto credentialsUser,
+            string name
+        )
         {
             var claims = new List<Claim>()
             {
